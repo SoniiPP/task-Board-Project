@@ -1,10 +1,10 @@
 // Retrieve tasks and nextId from localStorage
 let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
-let nextId = JSON.parse(localStorage.getItem("nextId")) || 1;
+let nextId = taskList.reduce((acc, task) => Math.max(acc, task.id), 0) +1;
 
 // Todo: create a function to generate a unique task id
 function generateTaskId() {
- return Date.now(); // Use current timestamp for simplicity
+ return nextId++; // Increment nextID for each new task
 }
 
 // Todo: create a function to create a task card
@@ -40,13 +40,14 @@ function renderTaskList() {
     $('#to-do, #in-progress, #done').empty(); // Clear existing tasks
     taskList.forEach(task => {
         const taskCard = createTaskCard(task);
-        $(`#${task.status}-cards`).append(taskCard);
+        $(`#${task.status}`).append(taskCard);
     });
 }
 
 // Function to save tasks to localStorage
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(taskList));
+    renderTaskList(); // Refresh the task list display
   }
 
 // Todo: create a function to handle adding a new task
@@ -56,13 +57,14 @@ function handleAddTask(event){
   const taskName = $('#taskName').val();
   const taskDescription = $('#taskDescription').val();
   const taskDeadline = $('#taskDeadline').val();
+  const taskStatus = $('#taskStatus').val();
 
   const task = {
     id: generateTaskId(),
     name: taskName,
     description: taskDescription,
     deadline: taskDeadline,
-    status: 'to-do' // default status
+    status: taskStatus || 'to-do', // default status
   };
 
   taskList.push(task);
